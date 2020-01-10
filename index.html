@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Web SQL Database with HTML and Javascript</title>
+<meta name="viewport" content="user-scalable=no,width=device-width"/>
+<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+<script type="text/javascript" src="js/jquery.js"></script>
+</head>
+<style>
+	vermelho {
+		cursor: default;
+		color: red;
+	}
+
+			tr.hide_right > td, td.hide_right {
+			border-right-style: hidden;
+		}
+
+		tr.hide_left > td, td.hide_left {
+			border-left-style: hidden;
+		}
+		tr:hover {background-color:#ff0000;}
+</style>
+<body style="margin: 2%">
+	<form action="peso.html">
+		<input type="submit" class="btn btn-success" value="Peso">
+	</form>
+	<div class="col-auto">
+		<div class="row">
+			<div class="col-auto" id="coluna1">
+				<label for="dia">Data:</label>
+				<input type="text" class="form-control" id="dia" name="">
+				<script>
+					//                        $("#dia").value = Date.now()
+					var data = new Date();
+					var texto = '' + data.getFullYear() + '-' + data.getMonth() + 1 + '-' + data.getDate() + '';
+					document.getElementById("dia").value = texto;
+				</script>
+			</div>
+			<div class="col-auto">
+				<label for="quantity">Qtd.</label>
+				<select class="form-control" type="number" id="quantity">
+					<option>1</option>
+					<option>2</option>
+					<option>3</option>
+					<option>4</option>
+				</select>
+			</div>
+			<div class="col-auto">
+				<label for="tamanho">Tamanho:</label>
+				<select class="form-control" type="text" id="tamanho" onchange="mudarquantsabor()">
+					<option>Pequena</option>
+					<option>Media</option>
+					<option>Grande</option>
+					<option>Giga</option>
+				</select>
+			</div>
+			<div class="col-auto">
+				<label for="quantidadesabor">No Sabores:</label>
+				<select class="form-control" type="number" id="quantidadesabor" onchange="selecao()">
+					<option>1</option>
+					<!--<option>2</option>
+				<option>3</option>
+				<option>4</option>-->
+				</select>
+			</div>
+			<div class="col-auto" id="colsabor1">
+				<label for="item" style="color: darkorchid">Sabor1</label>
+				<select class="form-control" id="Sabor1" onchange="atualizarremover()">
+				</select>
+			</div>
+			<div class="col-auto" id="colad0">
+				<label for="numeroad">Adicional?</label>
+				<select class="form-control" type="number" id="numeroad" onchange="selecaoadicional()">
+					<option>0</option>
+					<option>1</option>
+					<option>2</option>
+					<option>3</option>
+					<option>4</option>
+					<option>5</option>
+					<option>6</option>
+				</select>
+			</div>
+			<div class="col-auto" id="colremover0">
+				<label for="numeremocao">Remover</label>
+				<select class="form-control" type="number" id="numeroremocao" onchange="adicionarremover()">
+					<option>0</option>
+					<option>1</option>
+					<option>2</option>
+					<option>3</option>
+					<option>4</option>
+					<option>5</option>
+					<option>6</option>
+				</select>
+
+			</div>
+			<!--	<div class="col-1" id="coluna1">
+			<label for="minimo">Mín.</label>
+			<input type="number" class="form-control" id="minimo" name="" value="0">
+		</div>
+
+		<div class="col-1">
+			<label for="maximo">Máx.</label>
+			<input type="number" class="form-control" id="maximo" name="">
+		</div>--->
+		</div>
+		<div align="center">
+			<br>
+
+			<button type="button" id="insert" class="btn btn-success">Inserir</button>
+
+			<button type="button" id="create" class="btn btn-success">Criar tabela</button>
+
+			<button type="button" id="remove" class="btn btn-danger">Deletar tabela</button>
+
+			<button type="button" id="list" class="btn btn-success">Leitura</button>
+
+			<button type="button" id="listaingrediente" class="btn btn-success">Ingredientes</button>
+		</div>
+		<div class="col-1" align="left">
+			<select class="form-control" id="Leiturapreco">
+			</select>
+		</div>
+		<hr>
+		<h4>Preço</h4>
+		<table class="table table-bordered table-hover col-auto" id="precolist">
+		</table>
+
+		<hr>
+		<h4>Leituras</h4>
+		<table class="table table-bordered table-hover" id="itemlist">
+		</table>
+
+
+
+	</div>
+
+	<script>
+		$(document).ready(function () {
+            Criaropcoes("Sabor1");
+
+				var lista = document.getElementById('Leiturapreco');
+
+				for (var ilista = 0; ilista < ingredientes.length; ilista++) {
+					var voltar = document.createElement("option");
+					voltar.text = matriz[ilista][0];
+					lista.add(voltar);
+				}
+        });
+
+	</script>
+	<script>
+		var matriz=[
+            ['Alho e Óleo', 3, 1, 40, 1, 43, 1, 44, 1],
+            ['Alicci', 4, 1, 40, 1, 43, 1, 44, 1, 57, 0.7],
+            ['Americana', 10, 0.5, 12, 1, 40, 1, 43, 1, 44, 1, 45, 1, 52, 0.6],
+['Atum',6,1,40,1,43,1,44,1],
+['Atumzola',6,0.8,7,1,36,0.8,40,1,43,1,44,1],
+['Bacon',8,1,10,1,40,1,43,1,44,1],
+['Baiana',8,1,16,1,40,1,43,1,44,1,45,1,50,1],
+['Banana',1,1,11,1,43,0.5],
+['Batata Palha',12,1,21,0.6,40,1,43,1,44,1],
+['Berinjela',7,1,13,1,21,1,40,1,43,1,44,1],
+['Bolonhesa',19,1,40,2,43,1,44,1,47,0.5,51,1],
+['Brigadeiro',28,1,29,1,43,0.5],
+['Brócolis',10,0.4,14,1,21,1,25,0.5,40,1,43,1,44,1],
+['Brócolis Especial',3,0.8,10,0.4,14,1,40,1,43,1,44,1,47,0.5],
+['Caipira',21,1,34,1,39,0.5,40,1,43,1,44,1],
+['Calabresa',15,1,40,1,43,1,44,1],
+['Calabresa Cheddar',15,0.9,26,1,40,1,43,1,44,1],
+['Calabresa Cream Cheese',15,0.9,31,1,40,1,43,1,44,1],
+['Califórnia II',5,1,17,1,24,1,43,0.5],
+['Camarão',7,1,18,1,21,1,26,1,40,1,43,1,44,1],
+['Canadense',0,1,37,1,40,1,43,1,44,1],
+['Champignon',25,1,40,1,43,1,44,1],
+['Champilombo',7,1,21,1,25,0.4,37,0.9,40,1,43,1,44,1],
+['Chocolate Branco',27,1,43,0.5],
+['Choconana',1,1,29,0.4,43,0.5],
+['Cinco Queijos',21,1,36,1,40,1,43,0.8,44,1,47,0.5,53,0.5],
+['Coreana',7,1,25,0.3,34,0.6,40,1,43,1,44,1,53,0.4],
+['Crocante',10,0.4,12,1,21,0.6,40,1,43,1,44,1],
+['Da Hora',7,1,21,1,25,0.3,39,0.3,40,1,43,1,44,1,46,0.3,52,0.6],
+['Dois Amores',27,0.5,29,0.5,43,0.5],
+['Duas Camadas',40,1,43,1.6,44,1,52,1],
+['Escarola',3,0.9,4,0.5,10,0.4,33,1,40,1,43,1,44,1],
+['Espanhola',10,0.4,40,1,43,1,44,1,45,1,52,0.6,57,0.5],
+['Frango Cheddar',26,1,34,1,40,1,43,1,44,1],
+['Frango Cream Cheese',31,1,34,1,40,1,43,1,44,1],
+['Frango com Catupiry',21,1,34,1,40,1,43,1,44,1],
+['Gorgonzola',36,1,40,1,43,1,44,1,57,0.5],
+['Humita',8,1,39,0.5,40,1,43,1,44,1,57,0.5],
+['Italiana',8,1,40,1,43,1.2,44,1,55,1],
+['Italianíssima',21,1,25,0.3,40,1,43,1,44,1,47,0.2,55,1,57,0.5],
+['Lombo com Bacon',10,0.4,37,0.7,40,1,43,1.1,44,1],
+['Lombo com Catupiry',21,1,37,1,40,1,43,1,44,1],
+['Marguerita',38,1,40,1,43,1,44,1,47,0.3,57,1],
+['Marinara',6,0.6,7,1,40,1,43,1,44,1,53,0.5],
+['Milho',39,1,40,1,43,1,44,1],
+['Milho com Bacon',10,0.4,39,0.8,40,1,43,1,44,1],
+['Mista',7,1,10,0.4,12,1,21,0.6,34,0.3,37,0.3,39,0.3,40,1,43,1,44,1],
+['Mussarela',40,1,43,2,44,1],
+['Napolitana',40,1,43,1,44,1,47,0.3,57,1],
+['Nordestina',10,0.4,20,1,23,1,40,1,43,1,44,1,45,1,51,1],
+['Parmegiana',40,2,43,1,44,1,47,0.3,52,1],
+['Paulista',8,1,39,0.6,40,1,43,1,44,1,46,0.5],
+['Peperone',21,1,22,1,26,1,31,1,40,1,43,1,44,1,48,1],
+['Peruana',6,0.7,8,1,23,1,40,1,43,1,44,1],
+['Picanha',21,1,22,1,26,1,31,1,40,1,43,1,44,1,49,1],
+['Pizzaiolo',9,1,34,0.3,40,1,43,1.8,44,1,46,0.2,52,0.3,57,0.3],
+['Pompeia',7,1,10,0.4,21,1,40,1,43,1,44,1,47,0.4,57,0.4],
+['Portuguesa',8,1,23,1,40,1,43,1,44,1,45,1,51,1,52,0.8],
+['Prestígio',29,1,30,1,43,0.5],
+['Quratro Queijos',21,1,40,1,43,0.8,44,1,47,0.5,53,0.5],
+['Romana',8,1,40,1,43,1,44,1,47,0.3,52,0.7,57,0.4],
+['Romeu e Julieta',35,1,43,1],
+['Sensação',29,1,42,1,43,0.5],
+['Strogonoff',7,1,12,1,40,1,43,1,44,1,56,1],
+['Tomate Seco',40,1,43,1,44,1,54,1,58,1],
+['Vegetariana',8,1,32,1,39,0.5,40,1,43,1,44,1,51,1,57,0.4],
+['Vegetariana II',2,1,7,1,25,0.3,32,1,39,0.5,40,1,43,1,44,1,51,1,57,0.4],
+['Veneza',32,1,34,0.7,40,1,43,1,44,1,52,0.7]
+        ];
+
+
+		var ingredientes = ['Abacaxi', 'Acucar e Canela', 'Alcaparras', 'Alho frito', 'Alicci', 'Ameixa', 'Atum', 'Azeitona Preta', 'Azeitona Verde', 'Azeitonas picadas', 'Bacon', 'Banana', 'Batata Palha', 'Berinjela', 'Brócolis', 'Calabresa', 'Calabresa Moida', 'California', 'Camarao', 'Carne Moida', 'Carne Seca', 'Catupiry', 'Catupiry Original', 'Cebola', 'Cereja', 'Champignon', 'Cheddar', 'Chocolate Branco', 'Chocolate Granulado', 'Chocolate Preto', 'Coco Ralado', 'Creame Cheese', 'Ervilha', 'Escarola', 'Frango', 'Goiabada', 'Gorgonzola', 'Lombo', 'ManjericAo', 'Milho', 'Molho', 'Molho Branco', 'Morango', 'Mussarela', 'Oregano', 'Ovo', 'Palmito', 'Parmesao', 'Peperone', 'Picanha', 'Pimenta Calabresa', 'PimentAo', 'Presunto', 'Provolone', 'Rucula', 'Salame Italiano', 'Strogonoff', 'Tomate', 'Tomate Seco'];
+		var precos = [0.01, 0.003, 0.04, 0.025, 0.04, 0.04, 0.04, 0.02, 0.018, 0.02, 0.03, 0.003, 0.018, 0.01, 0.01, 0.02, 0.02, 0.02, 0.06, 0.03, 0.04, 0.0075, 0.025, 0.003, 0.045, 0.025, 0.0127, 0.018, 0.015, 0.018, 0.015, 0.027, 0.005, 0.003, 0.02, 0.03, 0.03, 0.02, 0.003, 0.015, 0.02, 0.015, 0.02, 0.016, 0.01, 0.008, 0.03, 0.03, 0.04, 0.057, 0.005, 0.004, 0.025, 0.03, 0.005, 0.037, 0.03, 0.01, 0.04];
+		var gastos = [1680.341642, 690.0734876, 2026.207015, 2653.131694, 2563.874601, 1549.498976, 2497.628394, 978.8059859, 2996.05271, 664.9810923, 316.8123489, 1134.571434, 469.7180677, 225.7323069, 2406.265302, 300.3696945, 1953.664855, 2358.810263, 2440.166646, 601.4896355, 2125.118208, 1305.838756, 1446.420192, 2724.536204, 2611.133624, 826.9699811, 669.9790729, 2908.659903, 1931.604357, 2049.747377, 1738.837921, 1792.458399, 1324.925378, 2374.376421, 764.8191662, 1894.406198, 2698.939278, 571.5071438, 1033.168192, 1521.214486, 1574.583833, 1983.897852, 622.6737217, 1817.882339, 250.3305925, 975.2255588, 2038.387088, 199.6714964, 912.1594379, 2814.740738, 502.231563, 705.3801236, 1920.987709, 1921.564636, 32.58341241, 280.2119695, 1118.430183, 1259.228895, 2062.921544];
+
+
+		function mudarquantsabor() {
+			var tama = document.getElementById('tamanho').value;
+			var atual = document.getElementById('quantidadesabor').value;
+			var lista = document.getElementById('quantidadesabor');
+			var lll = lista.length;
+			if (tama == 'Pequena') {
+				for (var i = 3; i > 0; i--)
+					lista.remove(i);
+				if (atual > 1)
+					selecao();
+			}
+			else if (tama == 'Media') {
+				if (lll < 2) {
+					var voltar = document.createElement("option");
+					voltar.text = 2;
+					lista.add(voltar);
+				}
+				for (var i = 3; i > 1; i--)
+					lista.remove(i);
+				if (atual > 2)
+					selecao();
+			}
+			else {
+				for (var i = 2; i < 5; i++) {
+					if (i > lista.length) {
+						var voltar = document.createElement("option");
+						voltar.text = i;
+						lista.add(voltar);
+					}
+				}
+
+			}
+
+		}
+
+		function selecao() {
+			var x = document.getElementById("quantidadesabor").value;
+			for (var i = 2; i < 5; i++) {
+				if (x >= i) {
+					if (document.getElementById('Sabor' + i) == null) {
+						var ii = i - 1;
+						$('<div class="col-auto" id="colsabor' + i + '"> <label for="Sabor' + i + '" style="color: darkorchid">Sabor' + i + '</label><select class="form-control" onchange="atualizarremover()" id="Sabor' + i + '"></select> </div>').insertAfter($('#colsabor' + ii));
+						Criaropcoes('Sabor' + i);
+					}
+				}
+				else
+					$('#colsabor' + i).remove();
+			}
+		}
+
+		function selecaoadicional() {
+			var adic = document.getElementById("numeroad").value;
+			for (var i = 1; i < 7; i++) {
+				if (adic >= i) {
+					if (document.getElementById('Adicional' + i) == null) {
+						var ii = i - 1;
+						$('<div class="col-auto" id="colad' + i + '"> <label for="Adicional' + i + '"style="color: darkblue">Ad.:' + i + '</label><select class="form-control" id="Adicional' + i + '"></select> </div>').insertAfter($('#colad' + ii));
+						Criaropcadd('Adicional' + i);
+					}
+				}
+				else
+					$('#colad' + i).remove();
+			}
+		}
+
+		function adicionarremover() {
+			var adic = document.getElementById("numeroremocao").value;
+			for (var i = 1; i < 7; i++) {
+				if (adic >= i) {
+					if (document.getElementById('Remover' + i) == null) {
+						var ii = i - 1;
+						$('<div class="col-auto" id="colremover' + i + '"> <label for="Remover' + i + '"style="color: darkblue">Rem.:' + i + '</label><select class="form-control" id="Remover' + i + '"></select> </div>').insertAfter($('#colremover' + ii));
+						Criarremocao('Remover' + i);
+					}
+				}
+				else
+					$('#colremover' + i).remove();
+			}
+		}
+
+
+		function Criarremocao(entra) {
+
+			//var ingredientes = ['Abacaxi', 'Acucar e Canela', 'Alcaparras', 'Alho frito', 'Alicci', 'Ameixa', 'Atum', 'Azeitona Preta', 'Azeitona Verde', 'Azeitonas picadas', 'Bacon', 'Banana', 'Batata Palha', 'Berinjela', 'Brócolis', 'Calabresa', 'Calabresa Moida', 'California', 'Camarao', 'Carne Moida', 'Carne Seca', 'Catupiry', 'Catupiry Original', 'Cebola', 'Cereja', 'Champignon', 'Cheddar', 'Chocolate Branco', 'Chocolate Granulado', 'Chocolate Preto', 'Coco Ralado', 'Creame Cheese', 'Ervilha', 'Escarola', 'Frango', 'Goiabada', 'Gorgonzola', 'Lombo', 'ManjericAo', 'Milho', 'Molho', 'Molho Branco', 'Morango', 'Mussarela', 'Oregano', 'Ovo', 'Palmito', 'Parmesao', 'Peperone', 'Picanha', 'Pimenta Calabresa', 'PimentAo', 'Presunto', 'Provolone', 'Rucula', 'Salame Italiano', 'Strogonoff', 'Tomate', 'Tomate Seco'];
+			var testeset = new Set();
+			var setingred = new Set();
+			var numerosabores = document.getElementById("quantidadesabor").value;
+			for (var i = 1; i <= numerosabores; i++)
+				testeset.add(document.getElementById('Sabor' + i).selectedIndex);
+			testeset.forEach(valor => {
+				//for (var p = 0; p < 67; p++)
+					//if (matriz[p][0] == valor)
+                //alert(valor);
+                for (var pp = 1; pp < matriz[valor].length; pp += 2)
+				setingred.add(ingredientes[matriz[valor][pp]]);
+			});
+			var x = document.getElementById(entra);
+			setingred.forEach(valorr => {
+				var option = document.createElement("option");
+				option.text = valorr;
+				x.add(option);
+			});
+		}
+
+		function atualizarremover() {
+			var testeset = new Set();
+			var setingred = new Set();
+			var numerosabores = document.getElementById("quantidadesabor").value;
+			for (var i = 1; i <= numerosabores; i++)
+				testeset.add(document.getElementById('Sabor' + i).selectedIndex);
+			testeset.forEach(valor => {
+                for (var pp = 1; pp < matriz[valor].length; pp += 2)
+				setingred.add(ingredientes[matriz[valor][pp]]);
+            });
+
+			var numeroremo;
+			var numeroremocoes = document.getElementById("numeroremocao").value;
+			for (var mm = 1; mm <= numeroremocoes; mm++) {
+				numeroremo = document.getElementById('Remover' + mm).length;
+				for (var rem = numeroremo - 1; rem > -1; rem--) {
+					var listaremocao = document.getElementById('Remover' + mm);
+					listaremocao.remove(rem);
+				}
+			}
+			setingred.forEach(valorr => {
+				for (var remm = 1; remm <= numeroremocoes; remm++) {
+					var x = document.getElementById('Remover' + remm);
+					var option = document.createElement("option");
+					option.text = valorr;
+					x.add(option);
+				}
+			});
+
+		}
+
+		function Criaropcoes(entra) {
+			//var listasabores = ['Calabresa', 'Mussarela', 'Catupiry', 'Abdu abdu', 'Portuguesa', 'Italiana', 'Parmesao', 'Ferrari'];
+			var i = 0;
+			var x = document.getElementById(entra);
+			for (i = 0; i < 68; i++) {
+				var option = document.createElement("option");
+				option.text = matriz[i][0];
+				x.add(option);
+			}
+		}
+
+		function Criaropcadd(entra) {
+			//var listasabores = ['Calabresa', 'Mussarela', 'Catupiry', 'Abdu abdu', 'Portuguesa', 'Italiana', 'Parmesao', 'Ferrari'];
+			var i = 0;
+			var x = document.getElementById(entra);
+			for (i = 0; i < 59; i++) {
+				var option = document.createElement("option");
+				option.text = ingredientes[i];
+				x.add(option);
+			}
+		}
+	</script>
+
+	<script type="text/javascript">
+		var db = openDatabase("itemDB", "1.0", "itemDB", 1024 * 1024);
+        $(function () {
+			var lasanhas=[
+['L BOLONHESA',19,150,40,150,43,150],
+['L FRANGO',34,150,40,150,43,150],
+['L MOLHO AO SUGO',40,150,43,150,52,150],
+['L MOLHO BRANCO',41,150,43,150,52,150],
+['C ATUM',6,150,7,150,40,150,43,150,44,150],
+['C BANANA',1,150,11,150,43,150],
+['C BRÓCOLIS',7,150,10,150,14,150,21,150,25,150,40,150,43,150,44,150],
+['C CALABRESA',7,150,15,150,32,150,39,150,40,150,43,150,44,150],
+['C CALIFÓRNIA',7,150,17,150,40,150,43,150,44,150],
+['C CHAMPILOMBO',7,150,25,150,36,150,37,150,40,150,43,150,44,150,47,150,53,150],
+['C CINCO QUEIJOS',7,150,21,150,36,150,40,150,43,150,44,150,47,150,53,150],
+['C DA HORA',7,150,21,150,25,150,39,150,40,150,43,150,44,150,46,150,52,150],
+['C ESCAROLA',7,150,10,150,21,150,33,150,40,150,43,150,44,150],
+['C ESPECIAL',6,150,7,150,21,150,23,150,40,150,43,150,44,150,45,150],
+['C FRANGO',7,150,21,150,34,150,40,150,43,150,44,150,46,150],
+['C MISTO',7,150,10,150,21,150,34,150,37,150,39,150,40,150,43,150,44,150],
+            ];
+			/*
+            for (var matt = 0; matt < 16; matt++)
+            {
+                var enviarapp = "<tr class='col-auto'><td>['" + lasanhas[matt][0] + "',";
+               // $("#itemlist").append("<tr class='col-auto'><td>['" + matriz[matt][0] + "',");
+
+                for (var coluu = 1; coluu < 60; coluu++)
+                {
+                    if (lasanhas[matt][coluu]>0)
+                    {	
+                        enviarapp += coluu - 1;
+                        //$("#itemlist").append(coluu-1);
+                        enviarapp += "," + lasanhas[matt][coluu] + ",";
+						//$("#itemlist").append(","+matriz[matt][coluu]+"");
+                    }
+                }
+                enviarapp += "]</td></tr>";
+				//$("#itemlist").append("]</td></tr>");
+				$("#itemlist").append(enviarapp);
+            }*/
+			
+			$("#create").click(function () {
+				db.transaction(function (transaction) {
+					var sql = "CREATE TABLE pizzas " +
+						"(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
+						"dia DATETIME NOT NULL," +
+						"quant INT(5) NOT NULL," +
+						"tamanho VARCHAR(100) NOT NULL," +
+						"numerosabores INT(5) NOT NULL," +
+						"sabor1 INT(5) NOT NULL," +
+						"sabor2 INT(5)," +
+						"sabor3 INT(5)," +
+						"sabor4 INT(5)," +
+						"adicional INT(5) NOT NULL," +
+						"adicional1 VARCHAR(100)," +
+						"adicional2 VARCHAR(100)," +
+						"adicional3 VARCHAR(100)," +
+						"adicional4 VARCHAR(100)," +
+						"adicional5 VARCHAR(100)," +
+						"adicional6 VARCHAR(100)," +
+						"remover INT(5) NOT NULL," +
+						"remocao1 VARCHAR(100)," +
+						"remocao2 VARCHAR(100)," +
+						"remocao3 VARCHAR(100)," +
+						"remocao4 VARCHAR(100)," +
+						"remocao5 VARCHAR(100)," +
+						"remocao6 VARCHAR(100))";
+					//"item VARCHAR(100) NOT NULL," +
+					//"quantity INT(5) NOT NULL)";
+					transaction.executeSql(sql, undefined, function () {
+						alert("Tabela criada!");
+					}, function () {
+						alert("Tabela ja existe");
+					})
+				});
+			});
+			// to remove
+
+			$("#remove").click(function () {
+
+				if (!confirm("Deletar esta tabela?", "")) return;;
+				db.transaction(function (transaction) {
+					var sql = "DROP TABLE pizzas";
+					transaction.executeSql(sql, undefined, function () {
+						alert("Tabela deletada.")
+					}, function (transaction, err) {
+						alert(err.message);
+					})
+				});
+			});
+
+			//to insert
+
+			$("#insert").click(function () {
+               // alert(document.getElementById("tamanho").selectedIndex);
+				var dia = $("#dia").val();
+				var quantidade = $("#quantity").val();
+				var tamanho = $("#tamanho").val();
+				var sabores = $("#quantidadesabor").val();
+				var sqlsabor = [];
+				var aux;
+				var envio = [dia, quantidade, tamanho, sabores];
+				var auxenvio = 4;
+				for (var i = 1; i <= sabores; i++) {
+					//aux = $('#Sabor' + i + '').val();
+                    aux = document.getElementById('Sabor' + i + '').selectedIndex;
+					envio[auxenvio++] = aux;
+					sqlsabor[i - 1] = aux;
+					// eval('var  sqlsabor'+ i +' = aux');  // in a function we use "this";
+				}
+				var numadicional = $("#numeroad").val();
+				envio[auxenvio++] = numadicional;
+				var sqladd = [];
+				for (var i = 1; i <= numadicional; i++) {
+					aux = $('#Adicional' + i + '').val();
+					envio[auxenvio++] = aux;
+					sqladd[i - 1] = aux;
+				}
+				var numremocao = $("#numeroremocao").val();
+				envio[auxenvio++] = numremocao;
+				var sqlremo = [];
+				for (var i = 1; i <= numremocao; i++) {
+					aux = $('#Remover' + i + '').val();
+					envio[auxenvio++] = aux;
+					sqlremo[i - 1] = aux;
+				}
+
+				//alert(envio);
+				db.transaction(function (transaction) {
+					//var sql = "INSERT INTO pizzas (dia,quant,tamanho,numerosabores,sabor1) VALUES(?,?)";
+					var sql = "INSERT INTO pizzas (dia,quant,tamanho,numerosabores"; //sabor1";) VALUES(?,?)";
+					for (var i = 1; i <= sabores; i++)
+						sql += ",sabor" + i + "";
+					sql += ",adicional";
+					for (var i = 1; i <= numadicional; i++)
+						sql += ",adicional" + i + "";
+					sql += ",remover";
+					for (var i = 1; i <= numremocao; i++)
+						sql += ",remocao" + i + "";
+					sql += ') VALUES (?,?,?,?,?,?';
+					for (var i = 1; i <= parseInt(sabores) + parseInt(numadicional) + parseInt(numremocao); i++)
+						sql += ',?';
+					sql += ")";
+					//   sql = "INSERT INTO ing (nome,ing0,ing1,ing2,ing3,ing4,ing5,ing6,ing7,ing8,ing9,ing10,ing11,ing12,ing13,ing14,ing15,ing16,ing17,ing18,ing19,ing20,ing21,ing22,ing23,ing24,ing25,ing26,ing27,ing28,ing29,ing30,ing31,ing32,ing33,ing34,ing35,ing36,ing37,ing38,ing39,ing40,ing41,ing42,ing43,ing44,ing45,ing46,ing47,ing48,ing49,ing50,ing51,ing52,ing53,ing54,ing55,ing56,ing57,ing58) VALUES (";
+					//  for (var polo = 0; polo <= 58;polo++)
+					//     sql += '?,';
+					// sql += '?)';
+					//alert(sql);
+					//    for (var uu = 0; uu <= 67; uu++)
+					transaction.executeSql(sql, envio, function () {
+						//		transaction.executeSql(sql, matriz[uu], function () {
+						alert("Item adicionado.");
+					}, function (transaction, err) {
+						alert(err.message);
+					})
+				})
+
+			})
+
+
+			//to fetch
+
+			$("#list").click(function () {
+				loadData();
+			})
+
+			$("#listaingrediente").click(function () {
+				carregaing();
+			})
+
+            function loadData() {
+                var custo1 = [document.getElementById("Leiturapreco").selectedIndex, 0.0];
+             //   var indice=15;
+                var areasabor = [];
+                custo1.push(matriz[custo1[0]].slice(1));
+                for (var auxarea = 2; auxarea < matriz[custo1[0]].length; auxarea += 2)
+                    areasabor[(auxarea/2)-1] = 0;
+
+                $("#itemlist").children().remove();
+				$("#precolist").children().remove();
+				db.transaction(function (transaction) {
+					var sql = "SELECT * FROM pizzas WHERE dia >= '2020-01-1' AND dia <= '2020-01-9' ORDER BY id DESC";// id BETWEEN ? AND ? ORDER BY id DESC";
+					//var sql = "SELECT * FROM pizzas WHERE dia BETWEEN '#1/1/2019#' AND '#1/3/2021#' ORDER BY id DESC";// id BETWEEN ? AND ? ORDER BY id DESC";
+                    transaction.executeSql(sql, null, function (transaction, result) {
+						if (result.rows.length) {
+							for (var i = 0; i < result.rows.length; i++) {
+								var row = result.rows.item(i);
+								// var apendi = '<tr><td>' + hdia + '</td><td>' + hquant + '</td><td>' + htamanho +;//'</td></tr>';
+								var apendi = '<tr align="right"><td>' + row.dia + '</td><td>' + row.quant + '</td><td>' + row.tamanho + '</td><td>' + row.numerosabores + '</td>';//<td class="hide_right">' + row.sabor1 + '</td>';
+
+								//for (var ii = 2; ii <= row.numerosabores; ii++) {
+								for (var ii = 1; ii <= 4; ii++) {
+									if (ii == 4)
+										apendi += '<td>';
+									else
+										apendi += '<td class="hide_right">';
+                                    if (row['sabor' + ii + ''] != null)
+                                    {
+                                        apendi += matriz[row['sabor' + ii + '']][0] + ' ';
+                                        var tamanhoenv = 0;
+											if (row.tamanho == 'Pequena')
+												tamanhoenv = parseInt(row.quant) * 346.19 / parseInt(row.numerosabores);
+											else if (row.tamanho == 'Media')
+												tamanhoenv = parseInt(row.quant) * 530.66 / parseInt(row.numerosabores);
+											else if (row.tamanho == 'Grande') {
+												tamanhoenv = parseInt(row.quant) * 754.39 / parseInt(row.numerosabores);
+											}
+											else if (row.tamanho == 'Giga')
+                                                tamanhoenv = parseInt(row.quant) * 1017.36 / parseInt(row.numerosabores);
+                                        if (custo1[0] == row['sabor' + ii + ''])
+                                            custo1[1] += tamanhoenv;
+                                     //   alert(custo1);
+                                        for (var auxcusto = 0; auxcusto < custo1[2].length; auxcusto += 2) {
+                                            for (var auxsomar = 1; auxsomar < matriz[row['sabor' + ii + '']].length; auxsomar += 2) {
+                                                if (custo1[2][auxcusto] == matriz[row['sabor' + ii + '']][auxsomar]) {
+                                                    areasabor[auxcusto / 2] += tamanhoenv * matriz[row['sabor' + ii + '']][(auxsomar) + 1];
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+
+										//}
+									}
+
+									apendi += '</td>';
+								}
+								//apendi += '<td>';
+								apendi += '<td>' + row.adicional + '</td>';
+								//   for (var ii = 1; ii <= row.adicional; ii++) {
+								for (var ii = 1; ii <= 4; ii++) {
+									apendi += '<td class="hide_right">';
+									if (row['adicional' + ii + ''] != null)
+										apendi += row['adicional' + ii + ''];
+									apendi += '</td>';
+								}
+								apendi += '<td>' + row.remover + '</td>';
+								//  for (var ii = 1; ii <= row.remover; ii++) {
+								for (var ii = 1; ii <= 5; ii++) {
+									if (ii == 5)
+										apendi += '<td>';
+									else
+										apendi += '<td class="hide_right">';
+									if (row['remocao' + ii + ''] != null)
+										apendi += row['remocao' + ii + ''];
+									apendi += '</td>';
+								}
+								apendi += '</tr>';
+								// apendi += row.adicional '</td><td>';
+								$("#itemlist").append(apendi);
+								//$("#itemlist").append('<tr><td>' + hdia + '</td><td>' + hquant + '</td><td>' + htamanho + '</td></tr>');
+							}
+						} else {
+							$("#itemlist").append('<tr><td colspan="3" align="center">Nenhum Item Encontrado</td></tr>');
+						}
+
+						//alert(custo1[1]);
+						//var auxiliar = custo1.length;
+						/*for (var jeff = 0; jeff < matriz[indice].length; jeff++) {
+							if (matriz[indice][jeff] > 0) {
+								custo1[auxiliar++] = jeff - 1;
+								custo1[auxiliar++] = matriz[indice][jeff];
+							}
+
+						}*/
+						var enviarcusto = '<tr><td>' + matriz[custo1[0]][0] + ' </td> <td>Area: ' + custo1[1] + ' </td>';
+						//var apendi = '<tr align="right"><td>' + row.dia + '</td><td>' + row.quant + '</td><td>' + row.tamanho + '</td><td>' + row.numerosabores + '</td>';
+						//$("#itemlist").append('<tr>');
+						precos[15] = 0.015;
+						precos[43] = 0.0172;
+						gastos[15] = 200;
+						gastos[43] = 200;
+						gastos[40] = 100;
+                        gastos[44] = 5;
+                       // alert(custo1[1]);
+                       // alert(areasabor);
+						var custototal = 0;
+                        for (var jeff = 0; jeff < custo1[2].length; jeff += 2) {
+                            var auxarea = custo1[1] * custo1[2][jeff + 1];
+                            var porcentagemarea = auxarea / areasabor[(jeff / 2)];
+							var custoarea = porcentagemarea*(gastos[custo1[2][jeff]] / auxarea);
+							var gastocm = custoarea * precos[custo1[2][jeff]];
+							custototal += gastocm;
+							//g/cm²
+							//   alert(custo1[jeff]);
+							enviarcusto += '<td> Area de ' + ingredientes[custo1[2][jeff]] + ' :' + auxarea + ' Custo g/cm²: ' + custoarea + ' Custo dinheiro/cm² = ' + gastocm + '</td>';
+                        }
+                        var custopequena =346.19*custototal;
+                        var customedia =530.66*custototal;
+                        var custogrande =754.39*custototal;
+                        var custogiga =1017.36 *custototal;
+
+						//enviarcusto += '<td> Custo: ' + custototal + '</td></tr>';
+                        enviarcusto += '<td> Custo pequena: ' + custopequena + '</td>';
+                        enviarcusto += '<td> Custo media: ' + customedia + '</td>';
+                        enviarcusto += '<td> Custo grande: ' + custogrande + '</td>';
+                        enviarcusto += '<label for="testepequena">Custo giga</label>';
+						enviarcusto += '<td id="testepequena"> Custo giga: ' + custogiga + '</td></tr>';
+					//	enviarcusto += '</tr>';
+						$("#precolist").append(enviarcusto);
+					}, function (transaction, err) {
+						alert('Nao existe tabela.');
+					})
+				})
+			}
+
+		})
+
+		function carregaing() {
+			$("#itemlist").children().remove();
+			db.transaction(function (transaction) {
+				var sql = "SELECT * FROM ing";// id BETWEEN ? AND ? ORDER BY id DESC";
+				transaction.executeSql(sql, null, function (transaction, result) {
+					if (result.rows.length) {
+						for (var i = 0; i < result.rows.length; i++) {
+							var row = result.rows.item(i);
+							// var apendi = '<tr><td>' + hdia + '</td><td>' + hquant + '</td><td>' + htamanho +;//'</td></tr>';
+							var apendi = '<tr align="right"><td>' + row.nome + '</td>';
+
+							//for (var ii = 2; ii <= row.numerosabores; ii++) {
+							for (var ii = 0; ii <= 58; ii++) {
+								apendi += '<td>';
+								if (row['ing' + ii + ''] != null)
+									apendi += row['ing' + ii + ''] + ' ';
+								apendi += '</td>';
+							}
+							apendi += '</tr>';
+							// apendi += row.adicional '</td><td>';
+							$("#itemlist").append(apendi);
+							//$("#itemlist").append('<tr><td>' + hdia + '</td><td>' + hquant + '</td><td>' + htamanho + '</td></tr>');
+						}
+					} else {
+						$("#itemlist").append('<tr><td colspan="3" align="center">Nenhum Item Encontrado</td></tr>');
+					}
+
+
+				}, function (transaction, err) {
+					alert('Nao existe tabela.');
+				})
+			})
+		}
+
+
+
+
+
+
+
+
+	</script>
+
+</body>
+</html>

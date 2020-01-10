@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Web SQL Database with HTML and Javascript</title>
+<meta name="viewport" content="user-scalable=no,width=device-width"/>
+<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+<script type="text/javascript" src="js/jquery.js"></script>
+</head>
+<style>
+	vermelho {
+		cursor: default;
+		color: red;
+	}
+
+			tr.hide_right > td, td.hide_right {
+			border-right-style: hidden;
+		}
+
+		tr.hide_left > td, td.hide_left {
+			border-left-style: hidden;
+		}
+		tr:hover {background-color:#ff0000;}
+</style>
+<body style="margin: 2%">
+	<form action="index.html">
+		<input type="submit" class="btn btn-success" value="Pizza">
+	</form>
+	<div class="col-auto">
+		<div class="row">
+			<div class="col-1" id="coluna1">
+				<label for="dia">Data:</label>
+				<input type="text" class="form-control" id="dia" name="">
+				<script>
+					//                        $("#dia").value = Date.now()
+					var data = new Date();
+					var texto = '' + data.getDate() + '/' + data.getMonth() + 1 + '/' + data.getFullYear() + '';
+					document.getElementById("dia").value = texto;
+				</script>
+			</div>
+			<div class="col-auto">
+				<label for="quantity">Peso(kg):</label>
+				<input type="number" class="form-control" id="peso" name="" value="0">
+			</div>
+
+			<div class="col-auto">
+				<label for="item" style="color: darkorchid">Ingrediente:</label>
+				<select class="form-control" id="ingselecionado">
+					<script>
+                        var ingredientes = ['Abacaxi', 'Acucar e Canela', 'Alcaparras', 'Alho frito', 'Alicci', 'Ameixa', 'Atum', 'Azeitona Preta', 'Azeitona Verde', 'Azeitonas picadas', 'Bacon', 'Banana', 'Batata Palha', 'Berinjela', 'Brócolis', 'Calabresa', 'Calabresa Moida', 'California', 'Camarao', 'Carne Moida', 'Carne Seca', 'Catupiry', 'Catupiry Original', 'Cebola', 'Cereja', 'Champignon', 'Cheddar', 'Chocolate Branco', 'Chocolate Granulado', 'Chocolate Preto', 'Coco Ralado', 'Creame Cheese', 'Ervilha', 'Escarola', 'Frango', 'Goiabada', 'Gorgonzola', 'Lombo', 'ManjericAo', 'Milho', 'Molho', 'Molho Branco', 'Morango', 'Mussarela', 'Oregano', 'Ovo', 'Palmito', 'Parmesao', 'Peperone', 'Picanha', 'Pimenta Calabresa', 'PimentAo', 'Presunto', 'Provolone', 'Rucula', 'Salame Italiano', 'Strogonoff', 'Tomate', 'Tomate Seco'];
+						var lista = document.getElementById('ingselecionado');
+
+                        for (var ilista = 0; ilista < ingredientes.length; ilista++)
+                        {
+							var voltar = document.createElement("option");
+                            voltar.text = ingredientes[ilista];
+                            lista.add(voltar);
+                        }
+					</script>
+				</select>
+			</div>
+		</div>
+
+		<br>
+        <div align="center">
+            <button type="button" id="insert" class="btn btn-success">Inserir</button>
+
+            <button type="button" id="create" class="btn btn-success">Criar tabela</button>
+
+            <button type="button" id="remove" class="btn btn-danger">Deletar tabela</button>
+
+            <button type="button" id="list" class="btn btn-success">Leitura</button>
+           <!---<button type="button" id="umavez" class="btn btn-success">Criarvalor1x</button>--->
+        </div>
+
+
+		<hr>
+		<h4>Leituras</h4>
+		<table class="table table-bordered table-hover" id="itemlist">
+		</table>
+	</div>
+
+    <script>
+		var ingredientes = ['Abacaxi', 'Acucar e Canela', 'Alcaparras', 'Alho frito', 'Alicci', 'Ameixa', 'Atum', 'Azeitona Preta', 'Azeitona Verde', 'Azeitonas picadas', 'Bacon', 'Banana', 'Batata Palha', 'Berinjela', 'Brócolis', 'Calabresa', 'Calabresa Moida', 'California', 'Camarao', 'Carne Moida', 'Carne Seca', 'Catupiry', 'Catupiry Original', 'Cebola', 'Cereja', 'Champignon', 'Cheddar', 'Chocolate Branco', 'Chocolate Granulado', 'Chocolate Preto', 'Coco Ralado', 'Creame Cheese', 'Ervilha', 'Escarola', 'Frango', 'Goiabada', 'Gorgonzola', 'Lombo', 'ManjericAo', 'Milho', 'Molho', 'Molho Branco', 'Morango', 'Mussarela', 'Oregano', 'Ovo', 'Palmito', 'Parmesao', 'Peperone', 'Picanha', 'Pimenta Calabresa', 'PimentAo', 'Presunto', 'Provolone', 'Rucula', 'Salame Italiano', 'Strogonoff', 'Tomate', 'Tomate Seco'];		
+        		var gastos = [1680.341642, 690.0734876, 2026.207015, 2653.131694, 2563.874601, 1549.498976, 2497.628394, 978.8059859, 2996.05271, 664.9810923, 316.8123489, 1134.571434, 469.7180677, 225.7323069, 2406.265302, 300.3696945, 1953.664855, 2358.810263, 2440.166646, 601.4896355, 2125.118208, 1305.838756, 1446.420192, 2724.536204, 2611.133624, 826.9699811, 669.9790729, 2908.659903, 1931.604357, 2049.747377, 1738.837921, 1792.458399, 1324.925378, 2374.376421, 764.8191662, 1894.406198, 2698.939278, 571.5071438, 1033.168192, 1521.214486, 1574.583833, 1983.897852, 622.6737217, 1817.882339, 250.3305925, 975.2255588, 2038.387088, 199.6714964, 912.1594379, 2814.740738, 502.231563, 705.3801236, 1920.987709, 1921.564636, 32.58341241, 280.2119695, 1118.430183, 1259.228895, 2062.921544];
+
+    </script>
+
+	<script type="text/javascript">
+    var db = openDatabase("itemDB", "1.0", "itemDB", 1024 * 1024);
+
+        $(function () {
+
+            //loadData();
+            $("#create").click(function () {
+                db.transaction(function (transaction) {
+                    var sql = "CREATE TABLE pesagem " +
+                        "(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
+                        "dia VARCHAR(100) NOT NULL," +
+                        "nome VARCHAR(100) NOT NULL," +
+                        "peso FLOAT(10) NOT NULL)";
+                    //"item VARCHAR(100) NOT NULL," +
+                    //"quantity INT(5) NOT NULL)";
+                    transaction.executeSql(sql, undefined, function () {
+                        alert("Tabela criada!");
+                    }, function () {
+                        alert("Tabela ja existe");
+                    })
+                });
+            });
+
+            $("#remove").click(function () {
+                if (!confirm("Deletar esta tabela?", "")) return;;
+                db.transaction(function (transaction) {
+                    var sql = "DROP TABLE pesagem";
+                    transaction.executeSql(sql, undefined, function () {
+                        alert("Tabela deletada.")
+                    }, function (transaction, err) {
+                        alert(err.message);
+                    })
+                });
+            });
+
+            //to insert
+
+            $("#insert").click(function () {
+                var dia = $("#dia").val();
+                var peso = $("#peso").val();
+                var ingsel = $("#ingselecionado").val();
+               // var envio = [dia, ingsel, peso];
+                //alert(envio);
+                db.transaction(function (transaction) {
+                    var sql = "UPDATE pesagem SET peso = ? WHERE nome = ?"; //sabor1";) VALUES(?,?)";
+                    transaction.executeSql(sql, [peso,ingsel], function () {
+                        alert("Item adicionado.");
+                    }, function (transaction, err) {
+                        alert(err.message);
+                    })
+                });
+            });
+
+
+            $("#umavez").click(function () {
+                var dia = $("#dia").val();
+                var peso = $("#peso").val();
+                var ingsel = $("#ingselecionado").val();
+                var envio = [dia, ingsel, peso];
+                //alert(envio);
+                    db.transaction(function (transaction) {
+                        for (var iumavez = 0; iumavez < ingredientes.length; iumavez++)
+                        {
+                            envio[1] = ingredientes[iumavez];
+                            envio[2] = gastos[iumavez]/1000;
+                            var sql = "INSERT INTO pesagem (dia,nome,peso) VALUES (?,?,?)"; //sabor1";) VALUES(?,?)";
+                            transaction.executeSql(sql, envio, function () {
+                                alert("Item adicionado.");
+                            }, function (transaction, err) {
+                                alert(err.message);
+                            })
+                        }
+                    });
+            });
+            //to fetch
+
+            $("#list").click(function () {
+                loadData();
+            })
+
+
+            function loadData() {
+                $("#itemlist").children().remove();
+                db.transaction(function (transaction) {
+                    var sql = "SELECT * FROM pesagem ORDER BY id ASC";
+                    transaction.executeSql(sql, null, function (transaction, result) {
+                        if (result.rows.length) {
+                            for (var i = 0; i < result.rows.length; i++) {
+                                var row = result.rows.item(i);
+                                var apendi = '<tr class="container"><td> '+row.id+' </td> <td>' + row.dia + '</td><td>' + row.nome + '</td><td>' + row.peso + '</td>';
+                                $("#itemlist").append(apendi);
+                            }
+                        } else {
+                            $("#itemlist").append('<tr><td colspan="3" align="center">Nenhum Item Encontrado</td></tr>');
+                        }
+                        }, function (transaction, err) {
+						alert('Nao existe tabela.');
+					})
+                    })
+            }
+        })
+
+	</script>
+
+</body>
+</html>
